@@ -7,17 +7,17 @@ import argparse
 from dotenv import load_dotenv
 
 
-def check_homework(CHAT_ID):
+def check_homework(chat_id):
     load_dotenv()
-    DEVMAN_TOKEN = os.getenv('DEVMAN_TOKEN')
-    BOT_TOKEN = os.getenv('BOT_TOKEN')
+    devman_token = os.getenv('DEVMAN_TOKEN')
+    bot_token = os.getenv('BOT_TOKEN')
 
-    bot = telegram.Bot(token=BOT_TOKEN)
+    bot = telegram.Bot(token=bot_token)
 
     while True:
         try:
             headers = {
-                'Authorization': DEVMAN_TOKEN,
+                'Authorization': devman_token,
 
             }
             response = requests.get('https://dvmn.org/api/long_polling/', headers=headers, timeout=60)
@@ -28,10 +28,10 @@ def check_homework(CHAT_ID):
                 lesson_url = response['new_attempts'][0]['lesson_url']
                 is_negative = response['new_attempts'][0]['is_negative']
                 if is_negative:
-                    bot.send_message(chat_id=CHAT_ID, text=f'У вас проверили работу "{lesson_title}"\n\n'
+                    bot.send_message(chat_id=chat_id, text=f'У вас проверили работу "{lesson_title}"\n\n'
                                                            f'К сожалению, в работе нашлись ошибки \n{lesson_url}')
                 else:
-                    bot.send_message(chat_id=CHAT_ID, text=f'У вас проверили работу "{lesson_title}"\n\n'
+                    bot.send_message(chat_id=chat_id, text=f'У вас проверили работу "{lesson_title}"\n\n'
                                                            f'Преподавателю всё понравилось, можно приступать к '
                                                            f'следующему уроку!{lesson_url}')
 
