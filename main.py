@@ -13,20 +13,20 @@ def check_homework(chat_id):
     bot_token = os.getenv('BOT_TOKEN')
 
     bot = telegram.Bot(token=bot_token)
-
+    params = None
     while True:
         try:
             headers = {
                 'Authorization': devman_token,
 
             }
-            response = requests.get('https://dvmn.org/api/long_polling/', headers=headers, timeout=60)
+            response = requests.get('https://dvmn.org/api/long_polling/', headers=headers, params=params, timeout=60)
             response.raise_for_status()
-            response = json.loads(response.text)
+            decoded_response = response.json()
             if response['status'] == 'found':
-                lesson_title = response['new_attempts'][0]['lesson_title']
-                lesson_url = response['new_attempts'][0]['lesson_url']
-                is_negative = response['new_attempts'][0]['is_negative']
+                lesson_title = decoded_response['new_attempts'][0]['lesson_title']
+                lesson_url = decoded_response['new_attempts'][0]['lesson_url']
+                is_negative = decoded_response['new_attempts'][0]['is_negative']
                 if is_negative:
                     bot.send_message(chat_id=chat_id, text=f'У вас проверили работу "{lesson_title}"\n\n'
                                                            f'К сожалению, в работе нашлись ошибки \n{lesson_url}')
@@ -35,9 +35,9 @@ def check_homework(chat_id):
                                                            f'Преподавателю всё понравилось, можно приступать к '
                                                            f'следующему уроку!{lesson_url}')
 
-            elif response['status'] == 'timeout':
-                payloads = {
-                   'timestamp': response['timestamp_to_request'],
+            elif decoded_response['status'] == 'timeout':
+                params = {
+                   'timestamp': decoded_response['timestamp_to_request'],
                 }
                 response = requests.get('https://dvmn.org/api/long_polling/', headers=headers, params=payloads)
                 response.raise_for_status()
