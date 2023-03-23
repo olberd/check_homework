@@ -29,15 +29,20 @@ def check_homework(chat_id):
                 lesson_url = decoded_response['new_attempts'][0]['lesson_url']
                 is_negative = decoded_response['new_attempts'][0]['is_negative']
                 if is_negative:
-                    bot.send_message(chat_id=chat_id, text=textwrap.dedent(f'''У вас проверили работу "{lesson_title}"
+                    text = textwrap.dedent(f'''\
+                    У вас проверили работу "{lesson_title}"
                     
-                                                           К сожалению, в работе нашлись ошибки
-                                                           {lesson_url}'''))
+                    К сожалению, в работе нашлись ошибки
+                    {lesson_url}''')
+
+                    bot.send_message(chat_id=chat_id, text=text)
                 else:
-                    bot.send_message(chat_id=chat_id, text=textwrap.dedent(f'''У вас проверили работу "{lesson_title}"
+                    text = textwrap.dedent(f'''\
+                    У вас проверили работу "{lesson_title}"
                     
-                                                           Преподавателю всё понравилось, можно приступать к следующему уроку! 
-                                                           {lesson_url}'''))
+                    Преподавателю всё понравилось, можно приступать к следующему уроку! 
+                    {lesson_url}''')
+                    bot.send_message(chat_id=chat_id, text=text)
 
             elif decoded_response['status'] == 'timeout':
                 params = {
