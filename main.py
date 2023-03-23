@@ -23,7 +23,7 @@ def check_homework(chat_id):
             response = requests.get('https://dvmn.org/api/long_polling/', headers=headers, params=params, timeout=60)
             response.raise_for_status()
             decoded_response = response.json()
-            if response['status'] == 'found':
+            if decoded_response['status'] == 'found':
                 lesson_title = decoded_response['new_attempts'][0]['lesson_title']
                 lesson_url = decoded_response['new_attempts'][0]['lesson_url']
                 is_negative = decoded_response['new_attempts'][0]['is_negative']
