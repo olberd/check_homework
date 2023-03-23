@@ -1,4 +1,5 @@
 import json
+import time
 import requests
 import telegram
 import os
@@ -25,7 +26,14 @@ def check_homework(CHAT_ID):
             if response['status'] == 'found':
                 lesson_title = response['new_attempts'][0]['lesson_title']
                 lesson_url = response['new_attempts'][0]['lesson_url']
-                bot.send_message(chat_id=CHAT_ID, text=f'У вас проверили работу "{lesson_title}"\n{lesson_url}')
+                is_negative = response['new_attempts'][0]['is_negative']
+                if is_negative:
+                    bot.send_message(chat_id=CHAT_ID, text=f'У вас проверили работу "{lesson_title}"\n\n'
+                                                           f'К сожалению, в работе нашлись ошибки \n{lesson_url}')
+                else:
+                    bot.send_message(chat_id=CHAT_ID, text=f'У вас проверили работу "{lesson_title}"\n\n'
+                                                           f'Преподавателю всё понравилось, можно приступать к '
+                                                           f'следующему уроку!{lesson_url}')
 
             elif response['status'] == 'timeout':
                 payloads = {
@@ -36,6 +44,7 @@ def check_homework(CHAT_ID):
         except requests.exceptions.ReadTimeout:
             continue
         except requests.exceptions.ConnectionError:
+            time.sleep(10)
             continue
 
 
