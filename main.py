@@ -39,8 +39,6 @@ def check_homework(chat_id):
                 params = {
                    'timestamp': decoded_response['timestamp_to_request'],
                 }
-                response = requests.get('https://dvmn.org/api/long_polling/', headers=headers, params=payloads)
-                response.raise_for_status()
         except requests.exceptions.ReadTimeout:
             continue
         except requests.exceptions.ConnectionError:
