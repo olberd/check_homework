@@ -23,11 +23,11 @@ def check_homework(chat_id):
             }
             response = requests.get('https://dvmn.org/api/long_polling/', headers=headers, params=params, timeout=60)
             response.raise_for_status()
-            decoded_response = response.json()
-            if decoded_response['status'] == 'found':
-                lesson_title = decoded_response['new_attempts'][0]['lesson_title']
-                lesson_url = decoded_response['new_attempts'][0]['lesson_url']
-                is_negative = decoded_response['new_attempts'][0]['is_negative']
+            review_info = response.json()
+            if review_info['status'] == 'found':
+                lesson_title = review_info['new_attempts'][0]['lesson_title']
+                lesson_url = review_info['new_attempts'][0]['lesson_url']
+                is_negative = review_info['new_attempts'][0]['is_negative']
                 if is_negative:
                     text = textwrap.dedent(f'''\
                     У вас проверили работу "{lesson_title}"
@@ -44,9 +44,9 @@ def check_homework(chat_id):
                     {lesson_url}''')
                     bot.send_message(chat_id=chat_id, text=text)
 
-            elif decoded_response['status'] == 'timeout':
+            elif review_info['status'] == 'timeout':
                 params = {
-                   'timestamp': decoded_response['timestamp_to_request'],
+                   'timestamp': review_info['timestamp_to_request'],
                 }
         except requests.exceptions.ReadTimeout:
             continue
