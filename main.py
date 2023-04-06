@@ -1,4 +1,3 @@
-import json
 import textwrap
 import time
 import requests
@@ -6,6 +5,7 @@ import telegram
 import os
 import argparse
 from dotenv import load_dotenv
+import logging
 
 
 def check_homework(chat_id):
@@ -56,7 +56,9 @@ def check_homework(chat_id):
 
 
 if __name__ == '__main__':
+    logging.basicConfig(level=logging.INFO)
     parser = argparse.ArgumentParser(description='Высылает уведомления о проверке работ в Телеграмм')
     parser.add_argument('chat_id', type=int, help='Введите chat_id')
     args = parser.parse_args()
+    logging.info('bot stated')
     check_homework(args.chat_id)
