@@ -8,12 +8,21 @@ from dotenv import load_dotenv
 import logging
 
 
-def check_homework(chat_id):
-    load_dotenv()
-    devman_token = os.getenv('DEVMAN_TOKEN')
-    bot_token = os.getenv('BOT_TOKEN')
+logger = logging.getLogger("Telegram logger")
 
-    bot = telegram.Bot(token=bot_token)
+
+class TgLogsHandler(logging.Handler):
+    def __init__(self, bot, chat_id):
+        super().__init__()
+        self.bot = bot
+        self.chat_id = chat_id
+
+    def emit(self, record):
+        log_entry = self.format(record)
+        self.bot.send_message(chat_id=self.chat_id, text=log_entry)
+
+
+def check_homework(devman_token, bot, chat_id, logger):
     params = None
     while True:
         try:
@@ -31,7 +40,7 @@ def check_homework(chat_id):
                 if is_negative:
                     text = textwrap.dedent(f'''\
                     У вас проверили работу "{lesson_title}"
-                    
+
                     К сожалению, в работе нашлись ошибки
                     {lesson_url}''')
 
@@ -39,8 +48,8 @@ def check_homework(chat_id):
                 else:
                     text = textwrap.dedent(f'''\
                     У вас проверили работу "{lesson_title}"
-                    
-                    Преподавателю всё понравилось, можно приступать к следующему уроку! 
+
+                    Преподавателю всё понравилось, можно приступать к следующему уроку!
                     {lesson_url}''')
                     bot.send_message(chat_id=chat_id, text=text)
 
@@ -48,17 +57,34 @@ def check_homework(chat_id):
                 params = {
                    'timestamp': review_info['timestamp_to_request'],
                 }
+
         except requests.exceptions.ReadTimeout:
+            time.sleep(10)
             continue
         except requests.exceptions.ConnectionError:
             time.sleep(10)
             continue
+        except Exception as err:
+            logger.exception(err)
 
 
-if __name__ == '__main__':
-    logging.basicConfig(level=logging.INFO)
+
+def main():
+    load_dotenv()
+    devman_token = os.getenv('DEVMAN_TOKEN')
+    bot_token = os.getenv('BOT_TOKEN')
+
+    bot = telegram.Bot(token=bot_token)
+
     parser = argparse.ArgumentParser(description='Высылает уведомления о проверке работ в Телеграмм')
     parser.add_argument('chat_id', type=int, help='Введите chat_id')
     args = parser.parse_args()
-    logging.info('bot stated')
-    check_homework(args.chat_id)
+    chat_id = args.chat_id
+    logger.setLevel(logging.INFO)
+    logger.addHandler(TgLogsHandler(bot, chat_id))
+    logger.info('Бот запустился')
+    check_homework(devman_token, bot, chat_id, logger)
+
+
+if __name__ == '__main__':
+    main()
