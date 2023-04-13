@@ -57,7 +57,6 @@ def check_homework(devman_token, bot, chat_id, logger):
                 params = {
                    'timestamp': review_info['timestamp_to_request'],
                 }
-
         except requests.exceptions.ReadTimeout:
             time.sleep(10)
             continue
@@ -66,15 +65,14 @@ def check_homework(devman_token, bot, chat_id, logger):
             continue
         except Exception as err:
             logger.exception(err)
+            continue
 
 
 def main():
     load_dotenv()
     devman_token = os.getenv('DEVMAN_TOKEN')
     bot_token = os.getenv('BOT_TOKEN')
-
     bot = telegram.Bot(token=bot_token)
-
     parser = argparse.ArgumentParser(description='Высылает уведомления о проверке работ в Телеграмм')
     parser.add_argument('chat_id', type=int, help='Введите chat_id')
     args = parser.parse_args()
