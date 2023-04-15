@@ -74,9 +74,12 @@ def main():
     bot_token = os.getenv('BOT_TOKEN')
     bot = telegram.Bot(token=bot_token)
     parser = argparse.ArgumentParser(description='Высылает уведомления о проверке работ в Телеграмм')
-    parser.add_argument('chat_id', type=int, help='Введите chat_id')
+    parser.add_argument('--chat_id', type=int, help='Введите chat_id')
     args = parser.parse_args()
-    chat_id = args.chat_id
+    if args.chat_id:
+        chat_id = args.chat_id
+    else:
+        chat_id = os.getenv('CHAT_ID')
     logger.setLevel(logging.INFO)
     logger.addHandler(TgLogsHandler(bot, chat_id))
     logger.info('Бот запустился')

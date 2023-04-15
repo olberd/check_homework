@@ -35,6 +35,7 @@ pip install -r requirements.txt
 ```
 DEVMAN_TOKEN=token
 BOT_TOKEN=token
+CHAT_ID=chat_id
 ```
 
 
@@ -45,9 +46,18 @@ BOT_TOKEN=token
 ## Как запустить
 
 Для запуска проекта в консоли необходимо выполнить команду:
-
 ```
 python3 main.py chat_id
+```
+Можно не указывать параметр `chat_id`, в этом случае `chat_id` берется из файла `.env`.
+## Создание и запуска докер контейнера
+Для создания докер контейнера выполните в командной строке в каталоге с программой
+```
+docker build --tag check_homework .
+```
+Для запуска контейнера
+```
+docker run -d check_homework
 ```
 
 ## Цель проекта
